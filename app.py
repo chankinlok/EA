@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from flask import Flask, abort, redirect, render_template, request, url_for
 
 app = Flask(__name__)
@@ -109,6 +108,30 @@ DISCUSSIONS = [
     },
 ]
 
+NEWS_ITEMS = [
+    {
+        "category": "Campus",
+        "date": "October 24, 2026",
+        "title": "Students turn the courtyard into a community garden",
+        "summary": "A new student-led project is bringing fresh produce, greener spaces, and neighbors together on campus.",
+        "read_time": "4 min read",
+    },
+    {
+        "category": "Technology",
+        "date": "October 21, 2026",
+        "title": "The ideas helping make technology more accessible",
+        "summary": "Local volunteers are sharing practical ways to make everyday digital tools easier for everyone to use.",
+        "read_time": "6 min read",
+    },
+    {
+        "category": "People",
+        "date": "October 18, 2026",
+        "title": "Meet the volunteers keeping the weekend club thriving",
+        "summary": "For more than a decade, a small group of neighbors has made room for creativity, conversation, and new friendships.",
+        "read_time": "3 min read",
+    },
+]
+
 
 def get_category(slug):
     return next((category for category in CATEGORIES if category["slug"] == slug), None)
@@ -136,6 +159,7 @@ def home():
             or query in post["body"].casefold()
             or query in post["author"].casefold()
         ]
+
     if sort_order == "hot":
         discussions.sort(key=lambda post: post["upvotes"] + post["comments"] * 2, reverse=True)
     elif sort_order == "top":
@@ -161,7 +185,8 @@ def new_discussion():
         title = request.form.get("title", "").strip()
         body = request.form.get("body", "").strip()
         category = request.form.get("category", "general")
-        author = request.form.get("author", "").strip() or "newneighbor"
+        raw_author = request.form.get("author", "").strip()
+        author = raw_author[:30] if raw_author else "newneighbor"
 
         if not title or not body:
             error = "Add a title and a few details before posting."
@@ -170,14 +195,17 @@ def new_discussion():
         elif not get_category(category):
             error = "Choose one of the listed discussion categories."
         else:
-            post_id = max(post["id"] for post in DISCUSSIONS) + 1
+            # 修正 1：防止 DISCUSSIONS 為空時 max() 報錯
+            post_id = max((post["id"] for post in DISCUSSIONS), default=0) + 1
+            
+            # 修正 2：確保 timestamp 格式與預設資料一致（轉為整數）
             DISCUSSIONS.insert(0, {
                 "id": post_id,
                 "category": category,
                 "title": title,
                 "body": body,
-                "author": author[:30],
-                "avatar": author[:1].upper() if author else "N",
+                "author": author,
+                "avatar": author[0].upper(),
                 "color": "teal",
                 "created": "just now",
                 "timestamp": int(datetime.now().timestamp()),
@@ -187,6 +215,7 @@ def new_discussion():
                 "replies": [],
             })
             return redirect(url_for("home", category=category))
+            
     return render_template("new_discussion.html", categories=CATEGORIES, error=error)
 
 
@@ -195,23 +224,27 @@ def discussion_detail(discussion_id):
     post = next((item for item in DISCUSSIONS if item["id"] == discussion_id), None)
     if post is None:
         abort(404)
+        
     error = None
     if request.method == "POST":
         body = request.form.get("body", "").strip()
-        author = request.form.get("author", "").strip() or "newneighbor"
+        raw_author = request.form.get("author", "").strip()
+        author = raw_author[:30] if raw_author else "newneighbor"
+        
         if not body:
             error = "Write a reply before posting."
         elif len(body) > 1000:
             error = "Keep your reply under 1,000 characters."
         else:
             post["replies"].append({
-                "author": author[:30],
-                "avatar": author[:1].upper(),
+                "author": author,
+                "avatar": author[0].upper(),
                 "body": body,
                 "created": "just now",
             })
             post["comments"] += 1
             return redirect(url_for("discussion_detail", discussion_id=discussion_id))
+            
     return render_template(
         "discussion.html",
         discussion=post,
@@ -231,30 +264,5 @@ def login():
     return render_template("login.html", message=message)
 
 
-NEWS_ITEMS = [
-    {
-        "category": "Campus",
-        "date": "October 24, 2026",
-        "title": "Students turn the courtyard into a community garden",
-        "summary": "A new student-led project is bringing fresh produce, greener spaces, and neighbors together on campus.",
-        "read_time": "4 min read",
-    },
-    {
-        "category": "Technology",
-        "date": "October 21, 2026",
-        "title": "The ideas helping make technology more accessible",
-        "summary": "Local volunteers are sharing practical ways to make everyday digital tools easier for everyone to use.",
-        "read_time": "6 min read",
-    },
-    {
-        "category": "People",
-        "date": "October 18, 2026",
-        "title": "Meet the volunteers keeping the weekend club thriving",
-        "summary": "For more than a decade, a small group of neighbors has made room for creativity, conversation, and new friendships.",
-        "read_time": "3 min read",
-    },
-]
-
-
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
