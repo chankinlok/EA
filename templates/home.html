@@ -1,63 +1,151 @@
 {% extends "base.html" %}
 
-{% block title %}The Daily Edit — Stories worth your time{% endblock %}
+{% block title %}Commonroom — Discussion, without the noise{% endblock %}
 
 {% block content %}
-  <section class="hero page-width">
-    <div class="hero-copy">
-      <p class="eyebrow"><span class="eyebrow-line"></span> Wednesday, October 28, 2026</p>
-      <h1>A little more <em>curiosity.</em><br>A lot more perspective.</h1>
-      <p class="hero-description">
-        Thoughtful stories about the people, ideas, and small changes shaping
-        the world around us.
-      </p>
-      <a class="button button-dark" href="{{ url_for('news') }}">Explore the latest <span aria-hidden="true">→</span></a>
-      <div class="hero-note">
-        <span class="note-mark" aria-hidden="true">✳</span>
-        <span>Independent stories, made for curious people.</span>
+  <div class="forum-shell">
+    <aside class="forum-sidebar" id="categories">
+      <div class="sidebar-heading">YOUR SPACE</div>
+      <a class="side-link {{ 'selected' if selected_category == 'all' else '' }}" href="{{ url_for('home', order=sort_order) }}">
+        <span class="side-icon">⌂</span> All discussions
+      </a>
+      <div class="sidebar-heading category-heading">CATEGORIES <span>+</span></div>
+      {% for category in categories %}
+        <a class="side-link {{ 'selected' if selected_category == category.slug else '' }}" href="{{ url_for('home', category=category.slug, order=sort_order) }}">
+          <span class="side-icon">{{ category.icon }}</span> {{ category.name }}
+        </a>
+      {% endfor %}
+      <div class="sidebar-note">
+        <span class="sidebar-note-icon">✳</span>
+        <strong>A little corner of the internet.</strong>
+        <p>Good conversations, different perspectives, and room for everyone.</p>
+        <a href="{{ url_for('new_discussion') }}">Start a discussion <span>→</span></a>
       </div>
-    </div>
+    </aside>
 
-    <div class="hero-art" role="img" aria-label="Abstract illustration of a sunrise over rolling hills">
-      <div class="sun"></div>
-      <div class="hill hill-back"></div>
-      <div class="hill hill-front"></div>
-      <span class="art-caption">A fresh perspective<br>starts here.</span>
-      <span class="art-index">VOL. 01 &nbsp; / &nbsp; 2026</span>
-    </div>
-  </section>
+    <section class="feed-column" aria-label="Discussion feed">
+      <div class="feed-welcome">
+        <div>
+          <p class="feed-kicker"><span class="online-dot"></span> YOUR DAILY DOSE OF COMMUNITY</p>
+          <h1>Good to see you<span>.</span></h1>
+          <p class="welcome-subtitle">A place for good conversations and new perspectives.</p>
+        </div>
+        <div class="welcome-doodle" aria-hidden="true">✳</div>
+      </div>
 
-  <section class="latest-section page-width">
-    <div class="section-heading">
-      <div>
-        <p class="eyebrow">The latest</p>
-        <h2>Stories to start with</h2>
+      <div class="feed-tools">
+        <form class="search-form" method="get" action="{{ url_for('home') }}">
+          <span aria-hidden="true">⌕</span>
+          <input type="search" name="q" value="{{ search_query }}" placeholder="Search discussions..." aria-label="Search discussions">
+          {% if selected_category != 'all' %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+          <input type="hidden" name="order" value="{{ sort_order }}">
+          <button type="submit">Search</button>
+        </form>
+        <a class="compose-button" href="{{ url_for('new_discussion') }}"><span>＋</span> Start a discussion</a>
       </div>
-      <a class="text-link" href="{{ url_for('news') }}">All stories <span aria-hidden="true">↗</span></a>
-    </div>
 
-    <a class="featured-story" href="{{ url_for('news') }}">
-      <div class="featured-art" aria-hidden="true">
-        <span class="featured-sun"></span>
-        <span class="featured-shape"></span>
-        <span class="featured-stem"></span>
+      <div class="feed-tabs" role="navigation" aria-label="Sort discussions">
+        <div class="feed-tab-list">
+          <a class="{{ 'active' if sort_order == 'now' else '' }}" href="{{ url_for('home', category=selected_category, q=search_query, order='now') }}">◷ <span>Now</span></a>
+          <a class="{{ 'active' if sort_order == 'hot' else '' }}" href="{{ url_for('home', category=selected_category, q=search_query, order='hot') }}">↗ <span>Hot</span></a>
+          <a class="{{ 'active' if sort_order == 'top' else '' }}" href="{{ url_for('home', category=selected_category, q=search_query, order='top') }}">★ <span>Top</span></a>
+        </div>
+        <span class="feed-count">{{ discussions|length }} discussions</span>
       </div>
-      <div class="featured-copy">
-        <p class="story-meta"><span>{{ featured_news.category }}</span><span>{{ featured_news.date }}</span></p>
-        <h3>{{ featured_news.title }}</h3>
-        <p>{{ featured_news.summary }}</p>
-        <span class="story-read">{{ featured_news.read_time }} <span aria-hidden="true">→</span></span>
-      </div>
-    </a>
-  </section>
 
-  <section class="newsletter-band">
-    <div class="page-width newsletter-inner">
-      <div>
-        <p class="eyebrow">A good thing in your inbox</p>
-        <h2>Make room for a new point of view.</h2>
+      {% if selected_category != 'all' %}
+        <div class="filter-label">Browsing <strong>{{ category_names[selected_category] }}</strong><a href="{{ url_for('home', order=sort_order) }}">Clear filter ×</a></div>
+      {% endif %}
+      {% if search_query %}
+        <div class="filter-label">Results for <strong>“{{ search_query }}”</strong><a href="{{ url_for('home', category=selected_category, order=sort_order) }}">Clear search ×</a></div>
+      {% endif %}
+
+      <div class="discussion-list">
+        {% for post in discussions %}
+          <article class="discussion-card">
+            <div class="vote-rail">
+              <button class="vote-button" type="button" aria-label="Upvote discussion" aria-pressed="false">▲</button>
+              <span class="vote-count">{{ post.upvotes }}</span>
+              <span class="vote-down" aria-hidden="true">▼</span>
+            </div>
+            <div class="discussion-content">
+              <div class="post-meta">
+                <a class="category-pill" href="{{ url_for('home', category=post.category, order=sort_order) }}">{{ category_names[post.category] }}</a>
+                <span class="meta-dot">·</span><span>{{ post.created }}</span><span class="meta-dot">·</span>
+                <span class="author-avatar avatar-{{ post.color }}">{{ post.avatar }}</span><span class="author-name">{{ post.author }}</span>
+                <span class="post-label">{{ post.tag }}</span>
+              </div>
+              <h2><a href="{{ url_for('discussion_detail', discussion_id=post.id) }}">{{ post.title }}</a></h2>
+              <p class="post-excerpt">{{ post.body }}</p>
+              <div class="post-actions">
+                <a href="{{ url_for('discussion_detail', discussion_id=post.id) }}#replies"><span aria-hidden="true">▤</span> {{ post.comments }} replies</a>
+                <button type="button" class="share-button" data-share-url="{{ url_for('discussion_detail', discussion_id=post.id, _external=True) }}"><span aria-hidden="true">↗</span> Share</button>
+                <button type="button" class="save-button" aria-pressed="false"><span aria-hidden="true">♡</span> Save</button>
+              </div>
+            </div>
+          </article>
+        {% else %}
+          <div class="empty-feed">
+            <span>☁</span>
+            <h2>No discussions found</h2>
+            <p>Try another search or start a conversation of your own.</p>
+            <a class="compose-button" href="{{ url_for('new_discussion') }}">Start a discussion <span>→</span></a>
+          </div>
+        {% endfor %}
       </div>
-      <a class="button button-light" href="{{ url_for('news') }}">Find your next read <span aria-hidden="true">→</span></a>
-    </div>
-  </section>
+      <p class="feed-end">You’re all caught up <span>✳</span></p>
+    </section>
+
+    <aside class="right-sidebar">
+      <div class="community-card">
+        <div class="community-illustration" aria-hidden="true"><span>✳</span><span>◡</span><span>✦</span></div>
+        <p class="community-eyebrow">WELCOME IN</p>
+        <h2>Better together.</h2>
+        <p>Pull up a chair. There’s always room for one more voice.</p>
+        <a href="{{ url_for('new_discussion') }}">Join the conversation <span>→</span></a>
+      </div>
+      <div class="trending-card">
+        <div class="trending-heading"><h2>Popular right now</h2><span>✳</span></div>
+        {% for post in discussions|sort(attribute='upvotes', reverse=true) %}
+          {% if loop.index <= 3 %}
+            <a class="trending-item" href="{{ url_for('discussion_detail', discussion_id=post.id) }}">
+              <span class="trending-rank">0{{ loop.index }}</span>
+              <span><strong>{{ post.title }}</strong><small>{{ post.comments }} replies · {{ category_names[post.category] }}</small></span>
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <p class="sidebar-footer">A community made for conversation.<br><a href="{{ url_for('news') }}">About this space</a></p>
+    </aside>
+  </div>
+  <script>
+    document.querySelectorAll(".vote-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const pressed = button.getAttribute("aria-pressed") === "true";
+        const count = button.parentElement.querySelector(".vote-count");
+        count.textContent = Number(count.textContent) + (pressed ? -1 : 1);
+        button.setAttribute("aria-pressed", String(!pressed));
+        button.classList.toggle("voted", !pressed);
+      });
+    });
+    document.querySelectorAll(".save-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const saved = button.getAttribute("aria-pressed") === "true";
+        button.setAttribute("aria-pressed", String(!saved));
+        button.classList.toggle("saved", !saved);
+        button.lastChild.textContent = saved ? " Save" : " Saved";
+      });
+    });
+    document.querySelectorAll(".share-button").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const url = button.dataset.shareUrl;
+        if (navigator.share) {
+          await navigator.share({ url });
+        } else if (navigator.clipboard) {
+          await navigator.clipboard.writeText(url);
+          button.lastChild.textContent = " Copied";
+        }
+      });
+    });
+  </script>
 {% endblock %}

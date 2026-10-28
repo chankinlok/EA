@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}{{ discussion.title }} — Commonroom{% endblock %}
+
+{% block content %}
+  <section class="thread-page">
+    <a class="back-link" href="{{ url_for('home', category=discussion.category) }}">← Back to {{ category_name }}</a>
+    <article class="discussion-card thread-card">
+      <div class="vote-rail">
+        <button class="vote-button" type="button" aria-label="Upvote discussion" aria-pressed="false">▲</button>
+        <span class="vote-count">{{ discussion.upvotes }}</span>
+        <span class="vote-down" aria-hidden="true">▼</span>
+      </div>
+      <div class="discussion-content">
+        <div class="post-meta">
+          <a class="category-pill" href="{{ url_for('home', category=discussion.category) }}">{{ category_name }}</a>
+          <span class="meta-dot">·</span><span>{{ discussion.created }}</span><span class="meta-dot">·</span>
+          <span class="author-avatar avatar-{{ discussion.color }}">{{ discussion.avatar }}</span><span class="author-name">{{ discussion.author }}</span>
+        </div>
+        <h1>{{ discussion.title }}</h1>
+        <p class="thread-body">{{ discussion.body }}</p>
+        <div class="post-actions"><a href="#replies"><span aria-hidden="true">▤</span> {{ discussion.comments }} replies</a></div>
+      </div>
+    </article>
+
+    <section class="replies-section" id="replies">
+      <div class="replies-heading"><h2>Conversation</h2><span>{{ discussion.replies|length }} replies</span></div>
+      {% for reply in discussion.replies %}
+        <article class="reply-card">
+          <span class="author-avatar avatar-teal">{{ reply.avatar }}</span>
+          <div><p class="reply-meta"><strong>{{ reply.author }}</strong><span>·</span>{{ reply.created }}</p><p class="reply-body">{{ reply.body }}</p></div>
+        </article>
+      {% else %}
+        <p class="first-reply">No replies yet. Be the first to join in.</p>
+      {% endfor %}
+      <form class="reply-form" method="post">
+        <h3>Add to the conversation</h3>
+        {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+        <label for="reply-author">Your display name <span>(optional)</span></label>
+        <input id="reply-author" name="author" type="text" maxlength="30" placeholder="newneighbor" value="{{ request.form.get('author', '') }}">
+        <label for="reply-body">Your reply</label>
+        <textarea id="reply-body" name="body" rows="4" maxlength="1000" placeholder="Share your thoughts..." required>{{ request.form.get('body', '') }}</textarea>
+        <button class="compose-button" type="submit">Post reply <span>→</span></button>
+      </form>
+    </section>
+  </section>
+  <script>
+    document.querySelectorAll(".vote-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const pressed = button.getAttribute("aria-pressed") === "true";
+        const count = button.parentElement.querySelector(".vote-count");
+        count.textContent = Number(count.textContent) + (pressed ? -1 : 1);
+        button.setAttribute("aria-pressed", String(!pressed));
+        button.classList.toggle("voted", !pressed);
+      });
+    });
+  </script>
+{% endblock %}

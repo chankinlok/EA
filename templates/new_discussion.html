@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Start a discussion — Commonroom{% endblock %}
+
+{% block content %}
+  <section class="compose-page">
+    <a class="back-link" href="{{ url_for('home') }}">← Back to discussions</a>
+    <div class="compose-panel">
+      <p class="feed-kicker"><span class="online-dot"></span> MAKE SOME ROOM FOR A NEW IDEA</p>
+      <h1>Start a discussion<span>.</span></h1>
+      <p class="compose-intro">Ask a question, share a thought, or get a conversation going.</p>
+      {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+      <form class="topic-form" method="post">
+        <label for="title">Give it a title</label>
+        <input id="title" name="title" type="text" maxlength="140" placeholder="What’s on your mind?" required value="{{ request.form.get('title', '') }}">
+        <label for="body">Add some details</label>
+        <textarea id="body" name="body" rows="7" maxlength="2000" placeholder="Give people a little context..." required>{{ request.form.get('body', '') }}</textarea>
+        <div class="compose-form-row">
+          <div class="form-field">
+            <label for="category">Choose a category</label>
+            <select id="category" name="category">
+              {% for category in categories %}
+                <option value="{{ category.slug }}" {% if request.form.get('category', 'general') == category.slug %}selected{% endif %}>{{ category.icon }} &nbsp; {{ category.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="author">Your display name <span>(optional)</span></label>
+            <input id="author" name="author" type="text" maxlength="30" placeholder="newneighbor" value="{{ request.form.get('author', '') }}">
+          </div>
+        </div>
+        <div class="compose-submit-row">
+          <p>Keep it kind. Good conversations welcome everyone.</p>
+          <button class="compose-button" type="submit">Post discussion <span>→</span></button>
+        </div>
+      </form>
+    </div>
+  </section>
+{% endblock %}
