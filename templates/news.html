@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}News — The Daily Edit{% endblock %}
+
+{% block content %}
+  <section class="news-intro page-width">
+    <p class="eyebrow"><span class="eyebrow-line"></span> The Daily Edit / Journal</p>
+    <h1>Stories for a<br><em>curious world.</em></h1>
+    <p>Fresh perspectives on the people, ideas, and moments moving us forward.</p>
+  </section>
+
+  <section class="news-list page-width" aria-label="Latest news stories">
+    {% for item in news_items %}
+      <article class="news-card">
+        <div class="news-card-art art-{{ loop.index }}" aria-hidden="true">
+          {% if loop.index == 1 %}
+            <span class="garden-sun"></span><span class="garden-bed"></span><span class="garden-plant"></span>
+          {% elif loop.index == 2 %}
+            <span class="tech-orbit orbit-one"></span><span class="tech-orbit orbit-two"></span><span class="tech-dot"></span>
+          {% else %}
+            <span class="people-circle circle-one"></span><span class="people-circle circle-two"></span><span class="people-circle circle-three"></span>
+          {% endif %}
+          <span class="card-number">0{{ loop.index }}</span>
+        </div>
+        <div class="news-card-copy">
+          <p class="story-meta"><span>{{ item.category }}</span><span>{{ item.date }}</span></p>
+          <h2>{{ item.title }}</h2>
+          <p class="news-summary">{{ item.summary }}</p>
+          <p class="story-read">{{ item.read_time }} <span aria-hidden="true">→</span></p>
+        </div>
+      </article>
+    {% endfor %}
+  </section>
+
+  <section class="news-bottom page-width">
+    <span class="note-mark" aria-hidden="true">✳</span>
+    <p>You’re all caught up.<br><span>Come back soon for something new.</span></p>
+  </section>
+{% endblock %}

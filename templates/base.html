@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f7f2">
+    <title>{% block title %}The Daily Edit{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="wordmark" href="{{ url_for('home') }}" aria-label="The Daily Edit home">
+        <span class="wordmark-icon" aria-hidden="true">D</span>
+        <span>The Daily Edit</span>
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a class="{{ 'active' if request.endpoint == 'home' else '' }}" href="{{ url_for('home') }}">Home</a>
+        <a class="{{ 'active' if request.endpoint == 'news' else '' }}" href="{{ url_for('news') }}">News</a>
+        <a class="nav-login {{ 'active' if request.endpoint == 'login' else '' }}" href="{{ url_for('login') }}">Log in <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <a class="wordmark footer-wordmark" href="{{ url_for('home') }}">
+        <span class="wordmark-icon" aria-hidden="true">D</span>
+        <span>The Daily Edit</span>
+      </a>
+      <p>Good stories. Curious minds. A brighter point of view.</p>
+      <span class="footer-copyright">© 2026 The Daily Edit</span>
+    </footer>
+  </body>
+</html>

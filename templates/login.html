@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Log in — The Daily Edit{% endblock %}
+
+{% block content %}
+  <section class="login-layout page-width">
+    <div class="login-art" role="img" aria-label="Abstract sun and hills illustration">
+      <span class="login-art-sun"></span>
+      <span class="login-art-hill login-art-hill-back"></span>
+      <span class="login-art-hill login-art-hill-front"></span>
+      <p>Stay open<br>to a new angle.</p>
+      <span class="login-art-caption">THE DAILY EDIT &nbsp; / &nbsp; EST. 2026</span>
+    </div>
+    <div class="login-panel">
+      <p class="eyebrow"><span class="eyebrow-line"></span> Your reading room</p>
+      <h1>Welcome<br><em>back.</em></h1>
+      <p class="login-description">Log in to pick up where your curiosity left off.</p>
+      {% if message %}
+        <p class="login-message" role="status">{{ message }}</p>
+      {% endif %}
+      <form class="login-form" method="post" action="{{ url_for('login') }}">
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required>
+        <button class="button button-dark login-submit" type="submit">Log in <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="login-note">This demo is a sign-in page only. User accounts are not configured.</p>
+    </div>
+  </section>
+{% endblock %}
