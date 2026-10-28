@@ -178,6 +178,11 @@ def home():
     )
 
 
+@app.get("/forum")
+def forum():
+    return home()
+
+
 @app.route("/discussion/new", methods=["GET", "POST"])
 def new_discussion():
     error = None

@@ -16,7 +16,8 @@ python app.py
 
 Open http://127.0.0.1:5000/ in your browser. The main pages are:
 
-- `/` — discussion feed, with category, search, and sort filters
+- `/` — home page with a discussion feed
+- `/forum` — full discussion forum, with category, search, and sort filters
 - `/discussion/new` — create a discussion
 - `/discussion/<id>` — discussion and replies
 - `/news` — original news page

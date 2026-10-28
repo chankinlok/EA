@@ -17,6 +17,7 @@
       <nav class="site-nav" aria-label="Main navigation">
         <a class="{{ 'active' if request.endpoint == 'home' else '' }}" href="{{ url_for('home') }}">Home</a>
         <a href="{{ url_for('home') }}#categories">Categories</a>
+        <a class="{{ 'active' if request.path == '/forum' else '' }}" href="{{ url_for('forum') }}">Forum</a>
         <a class="nav-login {{ 'active' if request.endpoint == 'login' else '' }}" href="{{ url_for('login') }}">Log in <span aria-hidden="true">↗</span></a>
       </nav>
     </header>
