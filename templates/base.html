@@ -1,38 +1,59 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f6f7f9">
-    <title>{% block title %}Commonroom — A place to talk{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/forum.css') }}">
-  </head>
-  <body>
-    <header class="site-header">
-      <a class="wordmark" href="{{ url_for('home') }}" aria-label="Commonroom home">
-        <span class="wordmark-icon" aria-hidden="true">c</span>
-        <span>commonroom</span>
-      </a>
-      <nav class="site-nav" aria-label="Main navigation">
-        <a class="{{ 'active' if request.endpoint == 'home' else '' }}" href="{{ url_for('home') }}">Home</a>
-        <a href="{{ url_for('home') }}#categories">Categories</a>
-        <a class="{{ 'active' if request.path == '/forum' else '' }}" href="{{ url_for('forum') }}">Forum</a>
-        <a class="nav-login {{ 'active' if request.endpoint == 'login' else '' }}" href="{{ url_for('login') }}">Log in <span aria-hidden="true">↗</span></a>
-      </nav>
-    </header>
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIHKG 討論區 (EA Demo)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #121212; color: #e0e0e0; }
+        .navbar-dark { background-color: #1e1e1e !important; border-bottom: 2px solid #f2a900; }
+        .card { background-color: #1e1e1e; color: #ffffff; border: 1px solid #333; }
+        .list-group-item { background-color: #1e1e1e; color: #d0d0d0; border-color: #333; }
+        .list-group-item:hover { background-color: #2a2a2a; color: #f2a900; }
+        .badge-lihkg { background-color: #f2a900; color: #000; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-warning" href="{{ url_for('index') }}">LIHKG 討論區</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-header navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index', cat='時事') }}">時事</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index', cat='娛樂') }}">娛樂</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index', cat='科技') }}">科技</a></li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    {% if current_user.is_authenticated %}
+                        <span class="text-light me-3">👤 {{ current_user.username }}</span>
+                        <a href="{{ url_for('create_post') }}" class="btn btn-warning btn-sm me-2">+ 發帖</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">登出</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-warning btn-sm me-2">登入</a>
+                        <a href="{{ url_for('register') }}" class="btn btn-warning btn-sm">註冊</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    <main>
-      {% block content %}{% endblock %}
-    </main>
+    <div class="container my-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    <footer class="site-footer">
-      <a class="wordmark footer-wordmark" href="{{ url_for('home') }}">
-        <span class="wordmark-icon" aria-hidden="true">c</span>
-        <span>commonroom</span>
-      </a>
-      <p>Good conversations start with showing up.</p>
-      <span class="footer-copyright">© 2026 Commonroom</span>
-    </footer>
-  </body>
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/validation.js') }}"></script>
+</body>
 </html>

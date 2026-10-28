@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-9">
+        <h4 class="mb-3 text-warning">📌 分類：{{ current_cat }}</h4>
+        <div class="list-group">
+            {% for post in posts %}
+                <a href="{{ url_for('post_detail', post_id=post.id) }}" class="list-group-item list-group-item-action py-3">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 text-light">{{ post.title }}</h5>
+                        <small class="text-muted">{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                    </div>
+                    <p class="mb-1 text-secondary">{{ post.content[:80] }}...</p>
+                    <small class="text-warning">✍️ {{ post.author.username }} | 💬 留言: {{ post.comments|length }}</small>
+                </a>
+            {% else %}
+                <div class="alert alert-dark">目前尚無任何討論文章。</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3">
+            <h5>熱門熱話</h5>
+            <p class="text-muted small">請選取左側貼文查看詳情並發表觀點。</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

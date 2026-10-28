@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9">
+        <div class="card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>{{ post.title }}</h2>
+                <!-- 額外 Python 功能：動態顯示 QR Code -->
+                <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#qrModal">
+                    📱 手機掃描 QR Code
+                </button>
+            </div>
+            <p class="text-muted border-bottom pb-2">
+                <span class="badge badge-lihkg me-2">{{ post.category }}</span>
+                發帖人: <strong>{{ post.author.username }}</strong> | 發佈時間: {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}
+            </p>
+            <div class="my-3 fs-5" style="white-space: pre-line;">{{ post.content }}</div>
+        </div>
+
+        <!-- 留言列表 -->
+        <h4 class="text-warning mb-3">💬 討論內容 ({{ post.comments|length }})</h4>
+        {% for comment in post.comments %}
+            <div class="card mb-2 p-3">
+                <div class="d-flex justify-content-between">
+                    <strong>#{{ loop.index }} {{ comment.commenter.username }}</strong>
+                    <small class="text-muted">{{ comment.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                </div>
+                <p class="mt-2 mb-0">{{ comment.content }}</p>
+            </div>
+        {% endfor %}
+
+        <!-- 新增留言 -->
+        <div class="card p-3 mt-4">
+            <h5>發表回覆</h5>
+            <form action="{{ url_for('post_detail', post_id=post.id) }}" method="POST">
+                <div class="mb-3">
+                    <textarea name="content" class="form-control bg-dark text-light" rows="3" placeholder="輸入你的意見..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-warning">送出回覆</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Modal -->
+<div class="modal fade" id="qrModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-light text-center">
+            <div class="modal-header">
+                <h5 class="modal-title">掃描此文章 QR Code</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <img src="{{ url_for('generate_qrcode', post_id=post.id) }}" alt="QR Code" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

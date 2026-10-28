@@ -1,31 +1,23 @@
-{% extends "base.html" %}
-
-{% block title %}Log in — The Daily Edit{% endblock %}
-
+{% extends 'base.html' %}
 {% block content %}
-  <section class="login-layout page-width">
-    <div class="login-art" role="img" aria-label="Abstract sun and hills illustration">
-      <span class="login-art-sun"></span>
-      <span class="login-art-hill login-art-hill-back"></span>
-      <span class="login-art-hill login-art-hill-front"></span>
-      <p>Stay open<br>to a new angle.</p>
-      <span class="login-art-caption">THE DAILY EDIT &nbsp; / &nbsp; EST. 2026</span>
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card p-4">
+            <h3 class="text-center text-warning mb-4">會員登入</h3>
+            <form action="{{ url_for('login') }}" method="POST" id="loginForm" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label class="form-label">使用者名稱</label>
+                    <input type="text" name="username" class="form-control bg-dark text-light" id="usernameInput" required>
+                    <div class="invalid-feedback">請輸入使用者名稱！</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">密碼</label>
+                    <input type="password" name="password" class="form-control bg-dark text-light" id="passwordInput" required>
+                    <div class="invalid-feedback">請輸入密碼！</div>
+                </div>
+                <button type="submit" class="btn btn-warning w-100">登入</button>
+            </form>
+        </div>
     </div>
-    <div class="login-panel">
-      <p class="eyebrow"><span class="eyebrow-line"></span> Your reading room</p>
-      <h1>Welcome<br><em>back.</em></h1>
-      <p class="login-description">Log in to pick up where your curiosity left off.</p>
-      {% if message %}
-        <p class="login-message" role="status">{{ message }}</p>
-      {% endif %}
-      <form class="login-form" method="post" action="{{ url_for('login') }}">
-        <label for="email">Email address</label>
-        <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
-        <label for="password">Password</label>
-        <input id="password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required>
-        <button class="button button-dark login-submit" type="submit">Log in <span aria-hidden="true">→</span></button>
-      </form>
-      <p class="login-note">This demo is a sign-in page only. User accounts are not configured.</p>
-    </div>
-  </section>
+</div>
 {% endblock %}
